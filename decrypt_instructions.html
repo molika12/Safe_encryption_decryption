@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Decrypt Files - SecureShare</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    /* --- FONT & RESET --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+    /* --- DARK THEME VARIABLES --- */
+    :root {
+        --bg-gradient-start: #0f172a; --bg-gradient-end: #1e293b;
+        --sidebar-bg: rgba(15, 23, 42, 0.9); --header-bg: rgba(30, 41, 59, 0.7);
+        --card-bg: rgba(30, 41, 59, 0.7); --input-bg: rgba(15, 23, 42, 0.5);
+        --text-primary: #f8fafc; --text-secondary: #e2e8f0; --text-muted: #94a3b8;
+        --border-color: rgba(255, 255, 255, 0.1); --border-input: #334155; --border-focus: #3b82f6;
+        --accent-gradient-start: #3b82f6; --accent-gradient-end: #8b5cf6; --accent-text: #3b82f6;
+        --accent-hover-bg: rgba(59, 130, 246, 0.2); --accent-focus-shadow: rgba(59, 130, 246, 0.1);
+        --accent-approve-gradient-start: #10b981; --accent-approve-gradient-end: #059669;
+        --accent-reject-gradient-start: #ef4444; --accent-reject-gradient-end: #dc2626;
+        --accent-reject-text: #ef4444; --accent-reject-shadow: rgba(239, 68, 68, 0.3);
+        --success-bg: rgba(16, 185, 129, 0.1); --success-border: rgba(16, 185, 129, 0.3); --success-text: #10b981;
+        --error-bg: rgba(239, 68, 68, 0.1); --error-border: rgba(239, 68, 68, 0.3); --error-text: #ef4444;
+        --info-bg: rgba(59, 130, 246, 0.1); --info-border: rgba(59, 130, 246, 0.3); --info-text: #3b82f6;
+    }
+
+    /* --- GLOBAL STYLES --- */
+    body { display: flex; min-height: 100vh; background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); color: var(--text-primary); overflow-x: hidden; }
+    .sidebar { width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(10px); color: var(--text-secondary); display: flex; flex-direction: column; padding: 30px 20px; border-right: 1px solid var(--border-color); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2); z-index: 100; flex-shrink: 0; }
+    .logo-container { display: flex; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+    .logo-icon { background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+    .logo-icon i { color: white; font-size: 20px; }
+    .logo-text { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar a { text-decoration: none; color: var(--text-secondary); margin-bottom: 15px; font-weight: 500; padding: 12px 15px; border-radius: 10px; display: flex; align-items: center; transition: all 0.3s ease; }
+    .sidebar a i { margin-right: 12px; width: 20px; text-align: center; font-size: 1.1rem; }
+    .sidebar a:hover, .sidebar a.active { background: var(--accent-hover-bg); color: var(--accent-text); transform: translateX(5px); }
+    .sidebar a.logout { margin-top: auto; color: var(--accent-reject-text); border: 1px solid var(--accent-reject-shadow); }
+    .sidebar a.logout:hover { background: var(--error-bg); transform: translateX(5px); }
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    header { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; background: var(--header-bg); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); flex-shrink: 0; }
+    header h1 { font-size: 1.8rem; font-weight: 600; color: var(--text-secondary); }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-approve-gradient-start) 0%, var(--accent-approve-gradient-end) 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; box-shadow: 0 4px 10px var(--accent-approve-shadow); color: white; }
+    .user-details { text-align: right; }
+    .user-details .sender-id { font-weight: 600; color: var(--text-muted); }
+    .user-details .sender-id span { color: var(--accent-text); }
+    .user-details .email { font-size: 0.9rem; color: var(--text-muted); }
+    .dashboard-content { padding: 30px 40px; flex-grow: 1; display: flex; justify-content: center; align-items: flex-start; }
+    .card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; padding: 30px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); border: 1px solid var(--border-color); animation: fadeInUp 0.6s ease-out; width: 100%; max-width: 800px; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .card-header { display: flex; align-items: center; margin-bottom: 25px; color: var(--text-secondary); font-size: 1.5rem; font-weight: 600; }
+    .card-header i { margin-right: 12px; font-size: 1.6rem; color: var(--accent-text); }
+    .instructions-list { list-style: none; padding-left: 0; }
+    .instructions-list li { margin-bottom: 25px; padding-left: 40px; position: relative; line-height: 1.6; color: var(--text-secondary); }
+    .instructions-list li::before { content: attr(data-step); position: absolute; left: 0; top: 0; width: 28px; height: 28px; background: var(--accent-text); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; }
+    .instructions-list strong { color: var(--text-primary); font-weight: 600; }
+    .instructions-list code { background-color: var(--input-bg); color: var(--accent-text); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+    .instructions-list a { color: var(--accent-text); text-decoration: none; font-weight: 500; }
+    .instructions-list a:hover { text-decoration: underline; }
+    .note { margin-top: 30px; padding: 15px; background: var(--info-bg); border-left: 4px solid var(--info-text); color: var(--info-text); border-radius: 8px; font-size: 0.9rem; }
+    .note i { margin-right: 8px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo-container">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="logo-text">SecureShare</div>
+    </div>
+    <a href="receiver_dashboard.html" id="linkDashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="request.html" id="linkRequest"><i class="fas fa-paper-plane"></i> Request Files</a>
+    <a href="decrypt.html" id="linkDecrypt"><i class="fas fa-unlock"></i> Decrypt File</a>
+    <a href="decrypt_instructions.html" id="linkInstructions"><i class="fas fa-question-circle"></i> How to Decrypt</a>
+    <a href="login.html" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<div class="main">
+    <header>
+        <h1>How to Decrypt Your Files</h1>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">R</div>
+            <div class="user-details">
+                <div class="sender-id">Linked Sender ID: <span id="senderId">Loading...</span></div>
+                <div class="email" id="emailDisplay">Loading...</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-key"></i>
+                <h2>Decryption Steps</h2>
+            </div>
+
+            <ol class="instructions-list">
+                <li data-step="1">
+                    <strong>Request the File:</strong> Go to the <a href="request.html">Request Files</a> section. Enter your email address and click "Send Request".
+                </li>
+                <li data-step="2">
+                    <strong>Wait for Approval:</strong> Wait for your sender to approve your request and upload the file. Keep the <a href="request.html">Request Files</a> page open or check back periodically.
+                </li>
+                <li data-step="3">
+                    <strong>Automatic Download:</strong> Once the sender approves and uploads the file, the encrypted file (usually a <code>.png</code> file) should automatically download.
+                </li>
+                <li data-step="4">
+                    <strong>Go to Decryption:</strong> Navigate to the <a href="decrypt.html">Decrypt File</a> page using the sidebar.
+                </li>
+                <li data-step="5">
+                    <strong>Select File Entry:</strong> Click the entry corresponding to the original name of the file.
+                </li>
+                <li data-step="6">
+                    <strong>Upload Encrypted File:</strong> Click "Choose encrypted file..." and select the encrypted <code>.png</code> file downloaded earlier.
+                </li>
+                <li data-step="7">
+                    <strong>Decrypt:</strong> Click "Decrypt and Download" button.
+                </li>
+                <li data-step="8">
+                    <strong>Final Download:</strong> Your browser will download the decrypted file.
+                </li>
+            </ol>
+
+            <div class="note">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Crucial:</strong> Uploading the wrong file will cause decryption to fail.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- User Info ---
+    const senderId = localStorage.getItem('senderId');
+    const userEmail = localStorage.getItem('email');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!senderId || !userEmail) {
+            document.getElementById('senderId').textContent = 'N/A';
+            document.getElementById('emailDisplay').textContent = 'Not logged in';
+            document.getElementById('userAvatar').textContent = '?';
+        } else {
+            document.getElementById('senderId').textContent = senderId;
+            document.getElementById('emailDisplay').textContent = userEmail;
+            document.getElementById('userAvatar').textContent = getUserInitials(userEmail);
+        }
+
+        // --- Sidebar Active Link ---
+        const current = window.location.pathname.split("/").pop();
+        const links = {
+            "receiver_dashboard.html": "linkDashboard",
+            "request.html": "linkRequest",
+            "decrypt.html": "linkDecrypt",
+            "decrypt_instructions.html": "linkInstructions"
+        };
+
+        Object.values(links).forEach(id => document.getElementById(id).classList.remove('active'));
+        if (links[current]) document.getElementById(links[current]).classList.add('active');
+    });
+
+    function getUserInitials(emailAddr) {
+        if (!emailAddr) return '?';
+        return emailAddr.split(/[\s@_.]+/).map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href='login.html';
+    }
+</script>
+</body>
+</html>

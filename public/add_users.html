@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add & Manage Receivers - SecureShare</title> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* --- FONT & RESET --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+    /* --- DARK THEME VARIABLES --- */
+    :root {
+        --bg-gradient-start: #0f172a; --bg-gradient-end: #1e293b;
+        --sidebar-bg: rgba(15, 23, 42, 0.9); --header-bg: rgba(30, 41, 59, 0.7);
+        --card-bg: rgba(30, 41, 59, 0.7); --input-bg: rgba(15, 23, 42, 0.5);
+        --input-focus-bg: rgba(15, 23, 42, 0.7); --list-item-bg: rgba(15, 23, 42, 0.5);
+        --list-item-hover-bg: rgba(30, 41, 59, 0.7); --text-primary: #f8fafc;
+        --text-secondary: #e2e8f0; --text-muted: #94a3b8; --border-color: rgba(255, 255, 255, 0.1);
+        --border-input: #334155; --border-focus: #3b82f6; --accent-gradient-start: #3b82f6;
+        --accent-gradient-end: #8b5cf6; --accent-text: #3b82f6; --accent-hover-bg: rgba(59, 130, 246, 0.2);
+        --accent-focus-shadow: rgba(59, 130, 246, 0.1); --accent-reject-gradient-start: #ef4444;
+        --accent-reject-gradient-end: #dc2626; --accent-reject-text: #ef4444;
+        --accent-reject-shadow: rgba(239, 68, 68, 0.3); --scrollbar-track-bg: rgba(15, 23, 42, 0.5);
+        --scrollbar-thumb-bg: #334155; --scrollbar-thumb-hover-bg: #475569;
+        --success-bg: rgba(16, 185, 129, 0.1); --success-border: rgba(16, 185, 129, 0.3); --success-text: #10b981;
+        --error-bg: rgba(239, 68, 68, 0.1); --error-border: rgba(239, 68, 68, 0.3); --error-text: #ef4444;
+    }
+
+    /* --- GLOBAL STYLES --- */
+    body { display: flex; min-height: 100vh; background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); color: var(--text-primary); overflow-x: hidden; }
+    .sidebar { width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(10px); color: var(--text-secondary); display: flex; flex-direction: column; padding: 30px 20px; border-right: 1px solid var(--border-color); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2); z-index: 100; flex-shrink: 0; }
+    .logo-container { display: flex; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+    .logo-icon { background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+    .logo-icon i { color: white; font-size: 20px; }
+    .logo-text { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar a { text-decoration: none; color: var(--text-secondary); margin-bottom: 15px; font-weight: 500; padding: 12px 15px; border-radius: 10px; display: flex; align-items: center; transition: all 0.3s ease; }
+    .sidebar a i { margin-right: 12px; width: 20px; text-align: center; font-size: 1.1rem; }
+    .sidebar a:hover, .sidebar a.active { background: var(--accent-hover-bg); color: var(--accent-text); transform: translateX(5px); }
+    .sidebar a.logout { margin-top: auto; color: var(--accent-reject-text); border: 1px solid var(--accent-reject-shadow); }
+    .sidebar a.logout:hover { background: var(--error-bg); transform: translateX(5px); }
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    header { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; background: var(--header-bg); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); flex-shrink: 0; }
+    header h1 { font-size: 1.8rem; font-weight: 600; color: var(--text-secondary); }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; box-shadow: 0 4px 10px var(--accent-focus-shadow); color: white; }
+    .user-details { text-align: right; }
+    .user-details .sender-id { font-weight: 600; color: var(--text-muted); }
+    .user-details .sender-id span { color: var(--accent-text); }
+    .user-details .email { font-size: 0.9rem; color: var(--text-muted); }
+    .dashboard-content { padding: 30px 40px; flex-grow: 1; display: flex; flex-direction: column; gap: 30px; } /* Added gap */
+    .card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); border: 1px solid var(--border-color); animation: fadeInUp 0.6s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .card-header { display: flex; align-items: center; margin-bottom: 20px; color: var(--text-secondary); font-size: 1.2rem; font-weight: 600; }
+    .card-header i { margin-right: 10px; font-size: 1.4rem; color: var(--accent-text); }
+    /* Form Styles */
+    .form-group { margin-bottom: 20px; position: relative; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-secondary); }
+    .form-group input { width: 100%; padding: 14px 15px 14px 45px; /* Adjust padding for icon */ border: 1px solid var(--border-input); border-radius: 10px; background: var(--input-bg); color: var(--text-primary); font-size: 1rem; transition: all 0.3s; }
+    .form-group input:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-focus-shadow); background: var(--input-focus-bg); }
+    .form-group input::placeholder { color: var(--text-muted); }
+    .input-icon { position: absolute; right: 15px; top: calc(50% + 14px); /* Adjusted for label */ transform: translateY(-50%); color: var(--text-muted); pointer-events: none; /* Icon shouldn't block input */ }
+    /* Button Styles */
+    .btn { padding: 12px 24px; border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.3s ease; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .add-btn { width: 100%; background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end)); box-shadow: 0 4px 15px var(--accent-focus-shadow); padding: 14px; font-size: 1rem; }
+    .add-btn:hover { box-shadow: 0 8px 20px var(--accent-focus-shadow); }
+    .add-btn:disabled { background: #475569; color: var(--text-disabled); cursor: not-allowed; transform: none; box-shadow: none; }
+    .delete-btn { background: linear-gradient(135deg, var(--accent-reject-gradient-start), var(--accent-reject-gradient-end)); box-shadow: 0 2px 8px var(--accent-reject-shadow); padding: 7px 12px; font-size: 0.85rem; }
+    .delete-btn:hover { background: linear-gradient(135deg, var(--accent-reject-gradient-end), #b91c1c); box-shadow: 0 4px 15px var(--accent-reject-shadow); }
+    /* User List */
+    .user-count { background: var(--accent-text); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem; margin-left: 10px; }
+    .list-container { max-height: 300px; overflow-y: auto; padding-right: 5px; margin-top: 15px; /* Add space below header */ }
+    .list-container::-webkit-scrollbar { width: 6px; }
+    .list-container::-webkit-scrollbar-track { background: var(--scrollbar-track-bg); border-radius: 10px; }
+    .list-container::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-bg); border-radius: 10px; }
+    .list-container::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover-bg); }
+    .user-item { margin-bottom: 10px; padding: 14px 15px; background: var(--list-item-bg); border-radius: 8px; border-left: 4px solid var(--accent-text); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+    .user-item:hover { background: var(--list-item-hover-bg); transform: translateX(5px); }
+    .user-item span { flex-grow: 1; margin-right: 15px; word-break: break-all; color: var(--text-secondary); }
+    /* Empty State */
+    .empty-state { text-align: center; padding: 30px; color: var(--text-muted); font-style: italic; min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .empty-state i { font-size: 2rem; margin-bottom: 15px; display: block; opacity: 0.5; }
+    /* Notification */
+    .notification { position: fixed; top: 90px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); z-index: 1000; transform: translateX(150%); transition: transform 0.4s ease-out; display: flex; align-items: center; gap: 10px; }
+    .notification.show { transform: translateX(0); }
+    .notification.success { background: var(--success-bg); color: var(--success-text); border-left: 5px solid var(--success-text); }
+    .notification.error { background: var(--error-bg); color: var(--error-text); border-left: 5px solid var(--error-text); }
+    /* Responsive */
+    @media (max-width: 768px) { /* ... keep existing responsive ... */ }
+    @media (max-width: 480px) { /* ... keep existing responsive ... */ }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo-container">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="logo-text">SecureShare</div>
+    </div>
+   <a href="sender_dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="encrypt.html"><i class="fas fa-paper-plane"></i> Encryption</a>
+    <a href="uploadfiles.html"><i class="fas fa-tasks"></i> Uploads & Accept</a>
+    <a href="add_users.html"><i class="fas fa-user-plus"></i> Add Users</a>
+    <a href="pending_requests.html"><i class="fas fa-clock"></i> Pending Requests</a>
+    <a href="encrypt_instructions.html" class="active"><i class="fas fa-question-circle"></i> How to Encrypt/Send</a>
+    <a href="#" class="logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</div>
+
+<div class="main">
+    <header>
+        <h1>Add & Manage Receivers</h1>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-details">
+                <div class="sender-id">ID: <span id="senderId">Loading...</span></div>
+                <div class="email" id="emailDisplay">Loading...</div> </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-plus"></i>
+                <h2>Add New Receiver</h2>
+            </div>
+            <div class="form-group">
+                <label for="addEmail">Email Address</label>
+                <input type="email" id="addEmail" placeholder="Enter receiver email" required> <span class="input-icon"><i class="fas fa-envelope"></i></span>
+            </div>
+            <div class="form-group">
+                <label for="addPassword">Set Temporary Password</label>
+                <input type="password" id="addPassword" placeholder="Create a password for the receiver" required> <span class="input-icon"><i class="fas fa-lock"></i></span>
+            </div>
+            <button class="btn add-btn" onclick="addUser()">
+                <i class="fas fa-plus-circle"></i> Add Receiver
+            </button>
+        </div>
+
+        <div class="card"> <div class="card-header">
+                <i class="fas fa-users"></i>
+                <h2>Current Receivers <span class="user-count" id="userCount">0</span></h2>
+            </div>
+            <div id="usersList" class="list-container"> <div class="empty-state">
+                    <i><i class="fas fa-spinner fa-spin"></i></i> <p>Loading receivers...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+     </div>
+
+<div id="notification" class="notification"></div>
+
+<script>
+   const API_URL = '';
+    const senderId = localStorage.getItem('senderId');
+    const email = localStorage.getItem('email'); // Sender's email
+    const userName = email ? email.split('@')[0] : 'User';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!senderId || !email) {
+            alert('No sender info found. Redirecting to login.');
+            window.location.href = 'login.html';
+            return;
+        }
+        // Populate header
+        document.getElementById('senderId').textContent = senderId;
+        document.getElementById('emailDisplay').textContent = email; // Use correct ID
+        document.getElementById('userAvatar').textContent = getUserInitials(userName);
+        loadReceivers();
+    });
+
+    function getUserInitials(name) {
+        if (!name) return 'U';
+        return name.split(/[\s@_.]+/).map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    // Load receivers
+    async function loadReceivers() {
+        const usersDiv = document.getElementById('usersList'); // Use correct ID
+        const userCountSpan = document.getElementById('userCount'); // Use correct ID
+        usersDiv.innerHTML = `<div class="empty-state"><i><i class="fas fa-spinner fa-spin"></i></i><p>Loading receivers...</p></div>`;
+
+        try {
+            const res = await fetch(`${API_URL}/receivers/${senderId}`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const data = await res.json();
+
+            if(data.success){
+                if(data.receivers.length === 0) {
+                    usersDiv.innerHTML = `<div class="empty-state"><i><i class="fas fa-user-slash"></i></i><p>No receivers added yet.</p></div>`;
+                    userCountSpan.textContent = '0';
+                } else {
+                    usersDiv.innerHTML = ''; // Clear loading
+                    data.receivers.forEach(r => {
+                        const userElement = document.createElement('div');
+                        userElement.className = 'user-item';
+                        // Make sure deleteReceiver uses the correct email argument
+                        userElement.innerHTML = `
+                            <span>${escapeHtml(r.email)}</span>
+                            <button class="btn delete-btn" onclick="deleteReceiver('${escapeHtml(r.email)}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>`;
+                        usersDiv.appendChild(userElement);
+                    });
+                    userCountSpan.textContent = data.receivers.length;
+                }
+            } else { throw new Error(data.message || 'Failed to load receivers'); }
+        } catch (error) {
+            console.error("Error loading receivers:", error);
+            usersDiv.innerHTML = `<div class="empty-state"><i><i class="fas fa-exclamation-triangle"></i></i><p style="color: var(--error-text);">Error: ${error.message}</p></div>`; // Use error color
+            userCountSpan.textContent = '0';
+        }
+    }
+
+    // Add receiver
+    async function addUser() {
+        const emailInput = document.getElementById('addEmail'); // Use correct ID
+        const passwordInput = document.getElementById('addPassword'); // Use correct ID
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        const addButton = document.querySelector('.add-btn');
+
+        if(!email || !password) {
+            showNotification("Please enter both email and password.", "error"); return;
+        }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+             showNotification("Please enter a valid email address.", "error"); return;
+        }
+
+        addButton.disabled = true;
+        addButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        try {
+            const res = await fetch(`${API_URL}/add-user`, {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({ senderId, email, password })
+            });
+            // Improved error handling
+            const data = await res.json(); // Always try to parse JSON
+            if (!res.ok) { throw new Error(data.message || `HTTP error! status: ${res.status}`); }
+
+            if(data.success){
+                showNotification(data.message || "Receiver added successfully!", "success");
+                emailInput.value=''; passwordInput.value='';
+                loadReceivers(); // Refresh list
+            } else { throw new Error(data.message || "Failed to add receiver"); }
+        } catch (error) {
+            console.error("Error adding user:", error);
+            showNotification(`Error: ${error.message}`, "error");
+        } finally {
+            addButton.disabled = false;
+            addButton.innerHTML = '<i class="fas fa-plus-circle"></i> Add Receiver';
+        }
+    }
+
+    // Delete receiver
+    async function deleteReceiver(receiverEmail) {
+    if (!confirm(`Are you sure you want to delete receiver: ${receiverEmail}?`)) return;
+
+    // Find the user-item div by matching the span text
+    const userItems = document.querySelectorAll('.user-item');
+    let userItem = null;
+    userItems.forEach(item => {
+        const span = item.querySelector('span');
+        if (span && span.textContent === receiverEmail) {
+            userItem = item;
+        }
+    });
+
+    const deleteButton = userItem?.querySelector('.delete-btn');
+    if (deleteButton) {
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/delete-receiver`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ senderId, receiverEmail })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || `HTTP error! status: ${res.status}`);
+
+        if (data.success) {
+            showNotification(data.message || "Receiver deleted successfully.", "success");
+            loadReceivers();
+        } else {
+            throw new Error(data.message || "Failed to delete receiver");
+        }
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        showNotification(`Error: ${error.message}`, "error");
+        if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        }
+    }
+}
+
+    // Show notification
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        // Add icons based on type
+        const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        notification.innerHTML = `<i class="fas ${iconClass}"></i> ${message}`;
+        notification.className = `notification ${type}`; // Apply base and type class
+        notification.classList.add('show');
+        setTimeout(() => { notification.classList.remove('show'); }, 4000);
+    }
+
+    // Utility: HTML Escaping
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Logout function
+    function logout(){
+      localStorage.clear();
+      window.location.href='login.html';
+    }
+
+</script>
+</body>
+</html>

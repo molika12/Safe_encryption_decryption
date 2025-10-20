@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureShare - Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); min-height: 100vh; overflow-x: hidden; position: relative; color: #f8fafc; }
+.particles { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+.particle { position: absolute; background: rgba(59, 130, 246, 0.1); border-radius:50%; animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform:translateY(0) rotate(0deg); opacity:0.7; } 50% { transform:translateY(-20px) rotate(180deg); opacity:0.3; } }
+.header { position: relative; z-index: 10; padding: 40px 20px 20px; text-align: center; }
+.logo-container { display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+.logo-icon { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+.logo-icon i { color: white; font-size: 24px; }
+.logo-text { font-size: 2.8rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.tagline { color: rgba(255,255,255,0.7); font-size: 1.2rem; font-weight: 300; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+.container { position:relative; z-index:10; display:flex; justify-content:center; align-items:center; min-height:70vh; padding:20px; }
+.login-card { display:flex; width:1200px; max-width:95%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border-radius:24px; overflow:hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.8s ease-out; }
+.hero-section { flex:1; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); display:flex; flex-direction:column; justify-content:center; align-items:center; padding:60px 40px; text-align:center; position:relative; overflow:hidden; }
+.hero-section::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px); background-size:50px 50px; animation: drift 20s linear infinite; }
+.hero-content { position:relative; z-index:2; max-width: 500px; }
+.hero-title { font-size:2.8rem; font-weight:700; color:white; margin-bottom:20px; line-height:1.2; text-shadow:0 2px 20px rgba(0,0,0,0.3); }
+.hero-subtitle { font-size:1.2rem; color: rgba(255,255,255,0.8); margin-bottom:30px; line-height:1.6; font-weight:300; }
+.feature-list { list-style: none; text-align: left; margin-top: 30px; }
+.feature-list li { color: rgba(255,255,255,0.9); margin-bottom: 15px; display: flex; align-items: center; font-weight: 400; }
+.feature-list li i { margin-right: 12px; color: #3b82f6; font-size: 1.2rem; }
+.form-section { flex:1; padding:60px 50px; display:flex; flex-direction:column; justify-content:center; background: rgba(30, 41, 59, 0.5); }
+.form-header { text-align:center; margin-bottom:35px; }
+.form-title { font-size:2.2rem; font-weight:600; color:#f8fafc; margin-bottom:10px; }
+.form-subtitle { font-size:1rem; color:#94a3b8; font-weight:400; }
+.role-toggle { display:flex; justify-content:center; margin-bottom:30px; background: rgba(15, 23, 42, 0.7); border-radius:12px; padding:4px; border: 1px solid rgba(255,255,255,0.1); }
+.role-toggle button { flex:1; border:none; padding:14px 24px; border-radius:10px; background:transparent; cursor:pointer; font-weight:600; font-size:0.95rem; position:relative; overflow:hidden; color: #94a3b8; display: flex; align-items: center; justify-content: center; }
+.role-toggle button i { margin-right: 8px; font-size: 1.1rem; }
+.role-toggle button.active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:white; box-shadow:0 4px 15px rgba(59, 130, 246, 0.3); transform:translateY(-1px); }
+.form-group { margin-bottom:24px; position:relative; }
+.form-group label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; color: #e2e8f0; }
+.form-group input { width:100%; padding:16px 20px; font-size:1rem; border:2px solid #334155; border-radius:12px; outline:none; transition: all 0.3s; background: rgba(15, 23, 42, 0.5); font-family:'Inter',sans-serif; color: #f8fafc; }
+.form-group input:focus { border-color:#3b82f6; box-shadow:0 0 0 4px rgba(59, 130, 246, 0.1); transform:translateY(-2px); background: rgba(15, 23, 42, 0.7); }
+.form-group input::placeholder { color:#64748b; }
+.submit-btn { width:100%; padding:18px; border:none; border-radius:12px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:white; font-weight:600; font-size:1.1rem; cursor:pointer; margin-top:10px; position:relative; overflow:hidden; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.submit-btn:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(59, 130, 246, 0.4); }
+#status { margin-top:20px; padding:12px; border-radius:8px; font-size:0.95rem; text-align:center; font-weight:500; transition: all 0.3s ease; min-height:20px; border: 1px solid transparent; }
+.login-link { text-align: center; margin-top: 25px; font-size: 0.95rem; color: #94a3b8; }
+.login-link a { color: #3b82f6; text-decoration: none; font-weight: 500; }
+.login-link a:hover { text-decoration: underline; }
+@media(max-width: 1024px) { .login-card { flex-direction: column; margin: 20px; } }
+</style>
+</head>
+<body>
+
+<div class="particles"> </div>
+
+<div class="header">
+  <div class="logo-container">
+    <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="logo-text">SecureShare</div>
+  </div>
+  <p class="tagline">Secure file sharing with enterprise-grade encryption and advanced access controls</p>
+</div>
+
+<div class="container">
+  <div class="login-card">
+    <div class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Create Your Account</h1>
+        <p class="hero-subtitle">Join SecureShare today to send and receive files with unparalleled security.</p>
+        <ul class="feature-list">
+          <li><i class="fas fa-shield-check"></i> End-to-end encryption</li>
+          <li><i class="fas fa-bolt"></i> Lightning-fast transfers</li>
+          <li><i class="fas fa-users"></i> Team collaboration</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-header">
+        <h2 class="form-title">Account Signup</h2>
+        <p class="form-subtitle">I am a...</p>
+      </div>
+
+      <div class="role-toggle">
+        <button id="senderBtn" class="active"><i class="fas fa-upload"></i> File Sender</button>
+        <button id="receiverBtn"><i class="fas fa-download"></i> File Receiver</button>
+      </div>
+
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email address" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a strong password" required>
+        </div>
+
+        <div class="form-group" id="senderIdGroup" style="display: none;">
+            <label for="senderId">Sender ID</label>
+            <input type="text" id="senderId" placeholder="Enter the Sender's Unique ID">
+        </div>
+        
+        <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
+      </form>
+      
+      <div id="status"></div>
+      
+      <div class="login-link">
+        Already have an account? <a href="login.html">Login here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let role = 'sender';
+const senderBtn = document.getElementById('senderBtn');
+const receiverBtn = document.getElementById('receiverBtn');
+const senderIdGroup = document.getElementById('senderIdGroup');
+const status = document.getElementById('status');
+
+// Role toggle logic
+senderBtn.addEventListener('click', () => { 
+  role = 'sender'; 
+  senderBtn.classList.add('active'); 
+  receiverBtn.classList.remove('active'); 
+  senderIdGroup.style.display = 'none';
+});
+
+receiverBtn.addEventListener('click', () => { 
+  role = 'receiver'; 
+  receiverBtn.classList.add('active'); 
+  senderBtn.classList.remove('active'); 
+  senderIdGroup.style.display = 'block';
+});
+
+// Form submit logic
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const senderId = document.getElementById('senderId').value;
+
+  const btn = e.target.querySelector('.submit-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...'; 
+  btn.disabled = true;
+
+  status.innerHTML = '';
+  status.style = ''; // Reset styles
+
+  // Prepare body
+  let bodyData = { role, email, password };
+  if (role === 'receiver') {
+    if (!senderId) {
+        status.innerHTML='❌ Sender ID is required for receivers.';
+        status.style.color='#ef4444';
+        btn.innerHTML = originalText; 
+        btn.disabled = false;
+        return;
+    }
+    bodyData.linkedSender = senderId;
+  }
+
+  try {
+    const res = await fetch('http://localhost:5000/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      status.innerHTML = '✅ Account created! Redirecting to login...';
+      status.style.color = '#10b981';
+      setTimeout(() => { 
+        window.location.href = 'login.html'; 
+      }, 2000);
+    } else {
+      status.innerHTML = '❌ ' + result.message;
+      status.style.color = '#ef4444';
+    }
+  } catch (e) {
+    status.innerHTML = '❌ Network error. Please check connection.';
+    status.style.color = '#ef4444';
+  } finally {
+    btn.innerHTML = originalText; 
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sender Dashboard - SecureShare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* --- STYLES (Keep all your existing styles here) --- */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+    overflow-x: hidden;
+    display: flex; /* Make body a flex container */
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(10px);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.logo-icon i { color: white; font-size: 20px; }
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #cbd5e1;
+    margin-bottom: 15px;
+    font-weight: 500;
+    padding: 12px 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.sidebar a i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    transform: translateX(5px);
+}
+
+.sidebar a.logout {
+    margin-top: auto; /* Pushes logout to bottom */
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.sidebar a.logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    transform: translateX(5px);
+}
+
+/* Main content */
+.main {
+    flex: 1; /* Takes remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allows content scrolling */
+}
+
+/* Header */
+header {
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0; /* Prevent header shrinking */
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.user-info { display: flex; align-items: center; gap: 15px; }
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.user-details { text-align: right; }
+.user-details .sender-id { font-weight: 600; color: #3b82f6; }
+.user-details .email { font-size: 0.9rem; color: #94a3b8; }
+
+/* Dashboard content area */
+.dashboard-content {
+    padding: 30px 40px; /* Padding for content below header */
+    flex-grow: 1; /* Allows content to fill space */
+}
+
+/* Dashboard stats */
+.stats { display: flex; gap: 25px; margin-bottom: 30px; flex-wrap: wrap; }
+
+.stat-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    flex: 1;
+    min-width: 220px;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+.stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
+.stat-card h3 { color: #cbd5e1; margin-bottom: 15px; font-size: 1rem; font-weight: 500; display: flex; align-items: center; }
+.stat-card h3 i { margin-right: 10px; font-size: 1.2rem; color: #3b82f6; }
+.stat-card p { font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-card .stat-trend { font-size: 0.9rem; margin-top: 5px; display: flex; align-items: center; }
+.stat-card .trend-up { color: #10b981; }
+.stat-card .trend-down { color: #ef4444; }
+
+/* Buttons */
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: inline-flex; /* Changed to inline-flex */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
+button:active { transform: translateY(0); }
+
+.action-btn { /* Smaller button style for table actions */
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: none; /* Remove main button shadow */
+}
+.action-btn:hover { background: rgba(59, 130, 246, 0.2); box-shadow: none; transform: translateY(-1px); }
+
+/* Table */
+.table-container { /* No padding needed here, handled by dashboard-content */ }
+.table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.table-header h2 { font-size: 1.5rem; font-weight: 600; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.table-actions { display: flex; gap: 10px; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+thead { background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3)); } /* Subtle gradient */
+thead th { padding: 18px 15px; text-align: left; font-weight: 600; color: #cbd5e1; /* Lighter color */}
+tbody td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #e2e8f0; vertical-align: middle; /* Align vertically */ }
+tbody tr:last-child td { border-bottom: none; } /* Remove border on last row */
+tbody tr:hover { background: rgba(59, 130, 246, 0.05); }
+
+.status { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; display: inline-block; /* Makes it sit nicely */ }
+.status.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status.pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.status.expired { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.status.N/A { background: rgba(100, 116, 139, 0.2); color: #64748b; } /* Style for N/A */
+
+.actions-cell { /* Container for action buttons */
+    display: flex;
+    gap: 8px;
+}
+
+/* Footer */
+footer {
+    padding: 20px 40px;
+    text-align: center;
+    margin-top: auto; /* Pushes footer to bottom */
+    color: #64748b;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0; /* Prevent footer shrinking */
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .sidebar { width: 240px; }
+    .dashboard-content { padding: 25px 30px; }
+}
+
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; padding: 20px; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .logo-container { width: 100%; justify-content: center; margin-bottom: 20px; }
+    .sidebar a { margin-bottom: 0; padding: 10px 15px; font-size: 0.9rem; }
+    .sidebar a.logout { margin-top: 0; }
+    header { padding: 0 20px; height: 70px; }
+    header h1 { font-size: 1.5rem; }
+    .dashboard-content { padding: 20px; }
+    .stats { flex-direction: column; gap: 15px; }
+    .table-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    table { display: block; overflow-x: auto; } /* Make table scrollable horizontally */
+}
+
+@media (max-width: 480px) {
+    header { flex-direction: column; height: auto; padding: 15px; gap: 10px; }
+    .user-info { flex-direction: column; text-align: center; gap: 8px; }
+    .user-details { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo-container">
+        <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="logo-text">SecureShare</div>
+    </div>
+    <a href="sender_dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="encrypt.html"><i class="fas fa-paper-plane"></i>Encryption</a>
+    <a href="uploadfiles.html"><i class="fas fa-tasks"></i> Uploads & Accept</a>
+    <a href="add_users.html"><i class="fas fa-user-plus"></i> Add Users</a>
+    <a href="pending_requests.html"><i class="fas fa-clock"></i> Pending Requests</a>
+    <a href="encrypt_instructions.html" class="active"><i class="fas fa-question-circle"></i> How to Encrypt/Send</a> 
+     <a href="#" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<div class="main">
+    <header>
+        <h1>Dashboard Overview</h1>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-details">
+                <div class="sender-id">ID: <span id="senderId"></span></div>
+                <div class="email" id="email"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="stats">
+            <div class="stat-card">
+                <h3><i class="fas fa-file-alt"></i> Total Files Sent</h3>
+                <p id="totalFiles">0</p>
+                </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-users"></i> Active Receivers</h3>
+                <p id="activeReceivers">0</p>
+                 </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-download"></i> Total Downloads (Est.)</h3>
+                <p id="totalDownloads">0</p>
+                </div>
+            <div class="stat-card">
+                 <h3><i class="fas fa-cloud-upload-alt"></i> Quick Actions</h3>
+                 <div style="display: flex; gap: 10px; margin-top: 15px;">
+                     <button onclick="window.location.href='encrypt.html'"><i class="fas fa-paper-plane"></i> Send File</button>
+                     <button onclick="window.location.href='add_users.html'"><i class="fas fa-user-plus"></i> Add User</button>
+                 </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Recent Sent Files</h2>
+                <div class="table-actions">
+                    <button class="action-btn" onclick="fetchDashboardData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Sent To</th> <th>Date Sent</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="fileTable">
+                    <tr><td colspan="5" style="text-align:center; padding: 30px;">Loading files...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 SecureShare. All rights reserved. | Secure file sharing for professionals
+    </footer>
+</div>
+
+<script>
+ const API_URL = '';
+    const senderId = localStorage.getItem('senderId');
+    const email = localStorage.getItem('email');
+    const userName = email ? email.split('@')[0] : 'User'; // Use email part as name
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!senderId || !email) {
+            alert('No sender info found. Redirecting to login.');
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('senderId').textContent = senderId;
+            document.getElementById('email').textContent = email;
+            document.getElementById('userAvatar').textContent = getUserInitials(userName);
+            fetchDashboardData(); // Fetch real data on load
+        }
+    });
+
+    function getUserInitials(name) {
+        if (!name) return 'U';
+        return name.split(/[\s@_.]+/).map(n => n[0]).join('').substring(0, 2).toUpperCase(); // More robust initials
+    }
+
+    async function fetchDashboardData() {
+        const tbody = document.getElementById('fileTable');
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Loading data...</td></tr>'; // Loading indicator
+
+        try {
+            const response = await fetch(`${API_URL}/dashboard-data/${senderId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+
+            if (result.success) {
+                populateDashboard(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to fetch dashboard data');
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px; color: #ef4444;">Could not load data: ${error.message}</td></tr>`;
+            // Clear stats on error
+            document.getElementById('totalFiles').textContent = 'Error';
+            document.getElementById('activeReceivers').textContent = 'Error';
+            document.getElementById('totalDownloads').textContent = 'Error';
+        }
+    }
+
+
+    function populateDashboard(data) {
+        document.getElementById('totalFiles').textContent = data.totalFiles || 0;
+        // Count unique receivers from the files list
+        const uniqueReceivers = new Set(data.files.map(file => file.receiverEmail));
+        document.getElementById('activeReceivers').textContent = uniqueReceivers.size || 0;
+        document.getElementById('totalDownloads').textContent = data.totalDownloads || 0; // Still using placeholder
+
+        const tbody = document.getElementById('fileTable');
+        tbody.innerHTML = ''; // Clear previous data or loading indicator
+
+        if (data.files && data.files.length > 0) {
+            data.files.forEach(file => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><i class="fas fa-file" style="margin-right: 8px; color: #3b82f6;"></i> ${escapeHtml(file.name)}</td>
+                    <td>${escapeHtml(file.receiverEmail)}</td>
+                    <td>${file.date}</td>
+                    <td><span class="status ${file.status || 'N/A'}">${file.status ? (file.status.charAt(0).toUpperCase() + file.status.slice(1)) : 'N/A'}</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" onclick="viewDetails('${escapeHtml(file.encryptedImage)}')"><i class="fas fa-eye"></i> View</button>
+                        <button class="action-btn" onclick="deleteFile('${escapeHtml(file.encryptedImage)}', '${escapeHtml(file.receiverEmail)}')"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px;">No files sent yet</td></tr>';
+        }
+    }
+
+    // Basic HTML escaping function
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
+
+    function viewDetails(encryptedFileName) {
+        alert('Viewing details for: ' + encryptedFileName + '\n(Functionality to be implemented)');
+        // In a real app, this might open a modal with more info
+    }
+
+    async function deleteFile(encryptedFileName, receiverEmail) {
+        if (!confirm(`Are you sure you want to delete the record for "${encryptedFileName}" sent to ${receiverEmail}? This cannot be undone.`)) {
+            return;
+        }
+        alert('Deleting file record: ' + encryptedFileName + '\n(Backend deletion functionality to be implemented)');
+        // --- TODO: Add Backend API Call ---
+        // 1. Create a new DELETE route in server.js, e.g., /delete-file-record
+        // 2. This route needs senderId, receiverEmail, and encryptedFileName
+        // 3. Find the sender, find the receiver, find the key entry in receiver.keys and remove it.
+        // 4. Send response back.
+        // 5. If successful, call fetchDashboardData() again to refresh the table.
+        // try {
+        //     const response = await fetch(`${API_URL}/delete-file-record`, {
+        //         method: 'DELETE',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ senderId, receiverEmail, encryptedFileName })
+        //     });
+        //     const result = await response.json();
+        //     if (result.success) {
+        //         fetchDashboardData(); // Refresh table
+        //     } else {
+        //         alert('Failed to delete file record: ' + result.message);
+        //     }
+        // } catch (error) {
+        //     alert('Error deleting file record: ' + error.message);
+        // }
+    }
+
+    function exportData() {
+        alert('Exporting data... (Functionality to be implemented)');
+        // This would typically involve fetching all data and converting to CSV/JSON
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href='login.html';
+    }
+</script>
+
+</body>
+</html>
